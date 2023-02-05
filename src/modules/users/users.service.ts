@@ -5,9 +5,10 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './interfaces/user.interface';
-import { v4 as uuidv4, validate as validateUUID } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { UserDto } from './dto/user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { checkEntity } from 'src/helpers/check-entity.helper';
 
 @Injectable()
 export class UsersService {
@@ -54,35 +55,18 @@ export class UsersService {
   }
 
   getUser(id: string): UserDto {
-    const isIdValid = validateUUID(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException('User id is invalid (not uuid)');
-    }
-
     const user = this.users.find((user) => user.id === id);
 
-    if (!user) {
-      throw new NotFoundException("User doesn't exist");
-    }
+    checkEntity(user, 'User', id);
 
     return this.getUserDto(user);
   }
 
   updatePassword(id: string, updatePasswordDto: UpdatePasswordDto): UserDto {
-    // TODO: use fragment for dont repeat this block in deleteUser method
-    const isIdValid = validateUUID(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException('User id is invalid (not uuid)');
-    }
-
     const userIndex = this.users.findIndex((user) => user.id === id);
     const user = this.users[userIndex];
 
-    if (!user) {
-      throw new NotFoundException("User doesn't exist");
-    }
+    checkEntity(user, 'User', id);
 
     const isPasswordCorrect = user.password === updatePasswordDto.oldPassword;
 
@@ -101,18 +85,10 @@ export class UsersService {
   }
 
   deleteUser(id: string) {
-    const isIdValid = validateUUID(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException('User id is invalid (not uuid)');
-    }
-
     const userIndex = this.users.findIndex((user) => user.id === id);
     const user = this.users[userIndex];
 
-    if (!user) {
-      throw new NotFoundException("User doesn't exist");
-    }
+    checkEntity(user, 'User', id);
 
     this.users.splice(userIndex, 1);
   }

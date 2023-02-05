@@ -1,3 +1,5 @@
+// TODO: move to entities folder
+
 export interface User {
   id: string; // uuid v4
   login: string;

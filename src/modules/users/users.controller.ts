@@ -5,6 +5,8 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserDto } from './dto/user.dto';
 import { Delete, HttpCode } from '@nestjs/common/decorators';
 
+// I prefer the plural way
+// TODO: rename method's names
 @Controller('user')
 export class UsersController {
   constructor(private usersService: UsersService) {}
