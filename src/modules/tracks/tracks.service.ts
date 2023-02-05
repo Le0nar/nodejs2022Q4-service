@@ -44,6 +44,8 @@ export class TracksService {
   }
 
   update(id: string, updateTrackDto: UpdateTrackDto): Track {
+    // TODO: add validate for updateArtistDto's fields
+
     const index = this.tracks.findIndex((track) => track.id === id);
     const track = this.tracks[index];
 
