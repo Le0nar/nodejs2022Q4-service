@@ -10,6 +10,10 @@ import { Track } from './entities/track.entity';
 export class TracksService {
   private readonly tracks: Track[] = [];
 
+  get trackList() {
+    return [...this.tracks];
+  }
+
   create(createTrackDto: CreateTrackDto): Track {
     const { name, albumId, artistId, duration } = createTrackDto;
     const isCorrectDto =

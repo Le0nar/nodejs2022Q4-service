@@ -9,6 +9,10 @@ import { checkEntity } from 'src/helpers/check-entity.helper';
 export class ArtistsService {
   private readonly artists: Artist[] = [];
 
+  get artistList(): Artist[] {
+    return [...this.artists];
+  }
+
   create(createArtistDto: CreateArtistDto): Artist {
     const { grammy, name } = createArtistDto;
     const isCorrectDto =

@@ -7,7 +7,12 @@ import { Album } from './entities/album.entity';
 
 @Injectable()
 export class AlbumsService {
+  // TODO: rename to _albums, albums
   private readonly albums: Album[] = [];
+
+  get albumList(): Album[] {
+    return [...this.albums];
+  }
 
   create(createAlbumDto: CreateAlbumDto) {
     const { artistId, name, year } = createAlbumDto;
