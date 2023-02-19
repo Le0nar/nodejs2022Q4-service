@@ -12,31 +12,31 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post()
-  createUser(@Body() createUserDto: CreateUserDto): UserDto {
-    return this.usersService.createUser(createUserDto);
+  create(@Body() createUserDto: CreateUserDto): UserDto {
+    return this.usersService.create(createUserDto);
   }
 
   @Get()
-  getUsers(): UserDto[] {
-    return this.usersService.getUsers();
+  findAll() {
+    return this.usersService.findAll();
   }
 
   @Get(':id')
-  getUser(@Param('id') id: string): UserDto {
-    return this.usersService.getUser(id);
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(id);
   }
 
   @Put(':id')
   updatePassword(
     @Param('id') id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
-  ): UserDto {
+  ) {
     return this.usersService.updatePassword(id, updatePasswordDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  deleteUser(@Param('id') id: string) {
-    return this.usersService.deleteUser(id);
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(id);
   }
 }

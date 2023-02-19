@@ -1,41 +1,25 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './interfaces/user.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { UserDto } from './dto/user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+// TODO: rename to User
+import { User } from './entities/user.entity';
 import { checkEntity } from 'src/helpers/check-entity.helper';
+import { NotFoundException } from '@nestjs/common/exceptions';
 
+// TODO: hide password from users
 @Injectable()
 export class UsersService {
-  // TODO: mb after adding DB write users to this array
-  private readonly users: User[] = [];
-
-  // TODO: mb move to utils
-  private getUserDto(user: User): UserDto {
-    const { createdAt, id, login, updatedAt, version } = user;
-    return { createdAt, id, login, updatedAt, version };
-  }
-
-  createUser(createUserDto: CreateUserDto): UserDto {
-    // TODO: mb move validate 'createUserdto' to utils
-    const isLoginString = typeof createUserDto.login === 'string';
-    const isPasswordString = typeof createUserDto.password === 'string';
-    const isCreateUserDtoValid = isLoginString && isPasswordString;
-
-    if (!isCreateUserDtoValid) {
-      throw new BadRequestException(
-        'Body does not contain required fields or fields are of the wrong type',
-      );
-    }
-
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
+  create(createUserDto: CreateUserDto) {
     const date = new Date().getTime();
 
-    // TODO:move to utils
     const user: User = {
       ...createUserDto,
       id: uuidv4(),
@@ -44,52 +28,36 @@ export class UsersService {
       version: 1,
     };
 
-    this.users.push(user);
-
-    return this.getUserDto(user);
+    this.usersRepository.save(user);
+    return user;
   }
 
-  getUsers(): UserDto[] {
-    const userDtoList = this.users.map((user) => this.getUserDto(user));
-    return userDtoList;
-  }
-
-  getUser(id: string): UserDto {
-    const user = this.users.find((user) => user.id === id);
-
-    checkEntity(user, 'User', id);
-
-    return this.getUserDto(user);
-  }
-
-  updatePassword(id: string, updatePasswordDto: UpdatePasswordDto): UserDto {
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    const user = this.users[userIndex];
+  async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
+    const user = await this.usersRepository.findOneBy({ id });
 
     checkEntity(user, 'User', id);
 
     const isPasswordCorrect = user.password === updatePasswordDto.oldPassword;
-
     if (!isPasswordCorrect) {
       throw new NotFoundException('Old password is wrong');
     }
 
-    const updatedUser: User = {
-      ...user,
-      password: updatePasswordDto.newPassword,
-    };
+    user.password = updatePasswordDto.newPassword;
 
-    this.users[userIndex] = updatedUser;
+    this.usersRepository.save(user);
 
-    return this.getUserDto(user);
+    return user;
   }
 
-  deleteUser(id: string) {
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    const user = this.users[userIndex];
+  findAll(): Promise<User[]> {
+    return this.usersRepository.find();
+  }
 
-    checkEntity(user, 'User', id);
+  findOne(id: string): Promise<User> {
+    return this.usersRepository.findOneBy({ id });
+  }
 
-    this.users.splice(userIndex, 1);
+  async remove(id: string): Promise<void> {
+    await this.usersRepository.delete(id);
   }
 }
