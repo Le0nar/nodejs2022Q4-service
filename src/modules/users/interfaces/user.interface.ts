@@ -1,4 +1,4 @@
-// TODO: move to entities folder
+// TODO: Delete it and use user.entity instead of it
 
 export interface User {
   id: string; // uuid v4
