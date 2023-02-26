@@ -3,30 +3,41 @@ import { LogData } from './log-data.interface';
 import { appendFile, mkdir } from 'fs/promises';
 
 class Logger implements LoggerService {
-  async log(message: LogData) {
-    const content = `url: ${message.url} \n
-query parameters: ${JSON.stringify(message.queryParameters)} \n
-status code: ${message.stausCode} \n
-body: ${JSON.stringify(message.body)} \n \n`;
+  getContent({ url, queryParameters, stausCode, body }) {
+    return `url: ${url} \n
+query parameters: ${JSON.stringify(queryParameters)} \n
+status code: ${stausCode} \n
+body: ${JSON.stringify(body)} \n \n`;
+  }
 
+  async log(message: LogData) {
     try {
       await mkdir('logs');
     } catch (error) {}
 
     try {
-      await appendFile('logs/logs.txt', content);
+      await appendFile('logs/logs.txt', this.getContent(message));
     } catch (error) {}
   }
-  async error(message: any, ...optionalParams: any[]) {
-    // mkdir('logs');
-    // appendFile('logs/errors.txt', content);
-    // TODO: add logic for write file
-    throw new Error('Method not implemented.');
+
+  async error(message: LogData) {
+    try {
+      await mkdir('logs');
+    } catch (error) {}
+
+    try {
+      await appendFile('logs/errors.txt', this.getContent(message));
+    } catch (error) {}
   }
 
-  async warn(message: any, ...optionalParams: any[]) {
-    // TODO: add logic for write file
-    throw new Error('Method not implemented.');
+  async warn(message: LogData) {
+    try {
+      await mkdir('logs');
+    } catch (error) {}
+
+    try {
+      await appendFile('logs/warnings.txt', this.getContent(message));
+    } catch (error) {}
   }
 }
 

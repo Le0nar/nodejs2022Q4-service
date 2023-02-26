@@ -5,15 +5,19 @@ import { LogData } from './log-data.interface';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: (error?: any) => void) {
-    // TODO: mb handle errors
+  async use(req: Request, res: Response, next: (error?: any) => void) {
     const logData: LogData = {
       url: req.originalUrl,
       queryParameters: req.query,
       body: req.body,
       stausCode: res.statusCode,
     };
-    logger.log(logData);
+
+    if (res.statusCode >= 400) {
+      await logger.error(logData);
+    } else {
+      await logger.log(logData);
+    }
 
     next();
   }
