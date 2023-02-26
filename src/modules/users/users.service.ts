@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { UserDto } from './dto/user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 // TODO: rename to User
 import { User } from './entities/user.entity';
@@ -29,7 +28,14 @@ export class UsersService {
     };
 
     this.usersRepository.save(user);
-    return user;
+
+    return {
+      id: user.id,
+      login: user.login,
+      createAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      version: user.version,
+    };
   }
 
   async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
@@ -49,12 +55,25 @@ export class UsersService {
     return user;
   }
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  async findAll() {
+    const users = await this.usersRepository.find();
+
+    return users.map((user) => {
+      delete user.password;
+      return user;
+    });
   }
 
-  findOne(id: string): Promise<User> {
-    return this.usersRepository.findOneBy({ id });
+  async findOne(id: string) {
+    const user = await this.usersRepository.findOneBy({ id });
+
+    return {
+      id: user.id,
+      login: user.login,
+      createAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      version: user.version,
+    };
   }
 
   async remove(id: string): Promise<void> {
