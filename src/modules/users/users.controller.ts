@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UserDto } from './dto/user.dto';
 import { Delete, HttpCode } from '@nestjs/common/decorators';
 
 // I prefer the plural way
@@ -12,7 +11,7 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto): UserDto {
+  create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
