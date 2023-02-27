@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -11,13 +12,17 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
-  signUp(authDto: AuthDto) {
+  signUp({ login, password }: AuthDto) {
     const date = new Date().getTime();
 
     const user: User = {
-      ...authDto,
+      login,
+      // TODO: hash password here
+      // password.hash(procces.env.SECRET_KEY),
+      password,
       id: uuidv4(),
       createdAt: date,
       updatedAt: date,
@@ -43,7 +48,12 @@ export class AuthService {
         `No user with such login, password doesn't match actual one`,
       );
     }
+    const { createdAt, id, updatedAt, version } = user;
 
-    return 'token';
+    const payload = { createdAt, id, login, updatedAt, version, password };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }
