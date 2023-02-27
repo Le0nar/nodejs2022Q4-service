@@ -24,8 +24,6 @@ export class AuthService {
 
     const user: User = {
       login,
-      // TODO: hash password here
-      // password.hash(procces.env.SECRET_KEY),
       password: hash,
       id: uuidv4(),
       createdAt: date,
