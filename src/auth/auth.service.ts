@@ -59,9 +59,7 @@ export class AuthService {
       );
     }
 
-    const { createdAt, id, updatedAt, version } = user;
-
-    const payload = { createdAt, id, login, updatedAt, version, password };
+    const payload = { id: user.id, login };
 
     return {
       access_token: this.jwtService.sign(payload),
